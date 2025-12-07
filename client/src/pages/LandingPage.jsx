@@ -2,6 +2,8 @@
 	import { AuthContext } from '../context/AuthContext';
 	import { useNavigate } from 'react-router-dom'
 
+	const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 	const LandingPage = () => {
 		const [serverOnline, setServerOnline] = useState(false);
 		const { user, loading } = useContext(AuthContext);
@@ -12,6 +14,22 @@
 				navigate('/profile'); // redirect if already logged in
 			}
 		}, [user, loading, navigate]);
+
+		// Check server status
+  		useEffect(() => {
+		const checkServer = async () => {
+			try {
+				const res = await fetch(`${API_BASE}/health`);
+				setServerOnline(res.ok);
+			} catch {
+				setServerOnline(false);
+			}
+		};
+
+    checkServer(); // initial check
+    const interval = setInterval(checkServer, 5000); // check every 5 sec
+    return () => clearInterval(interval);
+  }, []);
 
 		return (
 			<div className='relative min-h-screen flex flex-col items-center justify-center'>
@@ -41,6 +59,12 @@
 						Enter the Realms
 					</button>
 				</div>
+
+				{/* Server Status */}
+      			<div className='fixed bottom-4 right-4 flex items-center gap-2 text-white text-lg font-semibold z-30'>
+        			<span>Server</span>
+        			<span className={`w-3 h-3 rounded-full ${serverOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
+      			</div>
 			</div>
 		)
 	}
