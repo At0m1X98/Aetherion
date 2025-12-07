@@ -32,6 +32,7 @@ app.use("/api/classes", classRoutes);
 
 //Start route
 app.get('/', (req, res) => res.send({ message: 'Aetherion Realm API is running...' }));
+app.get('/api/health', (req, res) => res.send({ status: 'OK' }));
 
 //Start server
 const PORT = process.env.PORT || 5000;
